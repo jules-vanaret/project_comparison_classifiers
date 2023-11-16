@@ -17,9 +17,9 @@ classifiers = [
 names = ['linSVM', 'kSVM (RBF kernel)', 'DecisionTree']
 
 classifier_params = [
-    {'C': np.logspace(-2,2,5)},
-    {'C': np.logspace(-2,2,5), 'gamma': np.logspace(-2,2,5)},
-    {'max_depth': np.arange(1,10)}
+    {'C': np.logspace(-2,2,3)},
+    {'C': np.logspace(-2,2,3), 'gamma': np.logspace(-2,2,3)},
+    {'max_depth': np.arange(1,10,3), 'min_samples_leaf': np.arange(1,10,3)}
 ]
 
 
@@ -51,34 +51,70 @@ X_big = np.array(X_big).reshape(2,-1).T
 cond = X_big[:,0] > X_big[:,1]
 X_big = X_big[cond]
 
-fig, axes = plt.subplots(1,len(classifiers)+1, figsize=(10,3))
 
-axes[0].scatter(X[:,0],X[:,1],c=Y, s=2)
-axes[0].set_title('training set')
 
-for i,(name, classifier) in enumerate(zip(names, classifiers)):
+for i,(name, classifier, params) in enumerate(zip(names, classifiers, classifier_params)):
     print(name)
+    
+    if len(params.values()) == 1:
+        subplots_size = (1, len(list(params.values())[0]))
+        figsize = (len(list(params.values())[0])*1.5, 1.5)
+    else:
+        subplots_size = (len(list(params.values())[0]), len(list(params.values())[1]))
+        figsize = (len(list(params.values())[1])*1.5, len(list(params.values())[0])*1.5)
+    
+    print(figsize)
+    fig, axes = plt.subplots(*subplots_size, figsize=figsize)
 
-    t0= time()
+    # axes[0].scatter(X[:,0],X[:,1],c=Y, s=2)
+    # axes[0].set_title('training set')
+
+
     # learn a decision tree
-    for _ in range(n_repeats):
-        classifier_func = classifier()
-        classifier_func.fit(X,Y)
-    t1 = time()
-    print('\taverage fitting time:', (t1-t0)/n_repeats)
+    if len(params.values()) == 1:
+        for ind_param,param in enumerate(list(params.values())[0]):
+            # initialize classifier
+            classifier_func = classifier(**{list(params.keys())[0]:param})
+            # fit the classifier
+            classifier_func.fit(X,Y)
+            # predict the labels for the finer grid
+            Y_big = classifier_func.predict(X_big)
+            # plot the results
+            axes[ind_param].scatter(X_big[:,0],X_big[:,1],c=Y_big, s=0.1)
+            axes[ind_param].set_title(
+                f'{list(params.keys())[0]}={param}',
+                fontsize=7
+            )
+            axes[ind_param].set_xticks([])
+            axes[ind_param].set_yticks([])
 
-    for _ in range(n_repeats):
-        Y_big = classifier_func.predict(X_big)
-    t2 = time()
-    print('\taverage predicting time:', (t2-t1)/n_repeats)
+    else:
+        for i,param1 in enumerate(list(params.values())[0]):
+            for j,param2 in enumerate(list(params.values())[1]):
+                # initialize classifier
+                classifier_func = classifier(**{list(params.keys())[0]:param1, list(params.keys())[1]:param2})
+                # fit the classifier
+                classifier_func.fit(X,Y)
+                # predict the labels for the finer grid
+                Y_big = classifier_func.predict(X_big)
+                # plot the results
+                axes[i,j].scatter(X_big[:,0],X_big[:,1],c=Y_big, s=0.1)
 
-    # plot the results
-    axes[i+1].scatter(X_big[:,0],X_big[:,1],c=Y_big, s=0.1)
+                if name == 'DecisionTree':
+                    axes[i,j].set_title(
+                        f'{list(params.keys())[0]}={param1}, \n{list(params.keys())[1]}={param2}',
+                        fontsize=7
+                    )
+                else:
+                    axes[i,j].set_title(
+                        f'{list(params.keys())[0]}={param1}, {list(params.keys())[1]}={param2}',
+                        fontsize=7
+                    )
+                axes[i,j].set_xticks([])
+                axes[i,j].set_yticks([])
 
-    axes[i+1].set_title(name)
 
-
-fig.tight_layout()
+    fig.tight_layout()
 plt.show()
 
 

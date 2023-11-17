@@ -11,7 +11,7 @@ np.random.seed(45)
 classifiers = [
     partial(SVC, kernel='linear'),
     partial(SVC, kernel='rbf'),
-    DecisionTreeClassifier
+    partial(DecisionTreeClassifier, max_depth=5)
 ]
 
 names = ['linSVM', 'kSVM (RBF kernel)', 'DecisionTree']

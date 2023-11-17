@@ -26,7 +26,7 @@ Y = Y[np.triu_indices(n_points, k=1)]
 Y = Y.astype(int)
 
 # learn a decision tree
-classifier = SVC(C=100)
+classifier = SVC(C=100, probability=True)
 
 classifier.fit(X,Y)
 
@@ -36,12 +36,12 @@ X_big = np.array(X_big).reshape(2,-1).T
 cond = X_big[:,0] > X_big[:,1]
 X_big = X_big[cond]
 
-Y_big = classifier.predict(X_big)
+Y_big = classifier.predict_proba(X_big)[:,1]
 
 # plot the results
 fig, axes = plt.subplots(1,2)
-axes[0].scatter(X[:,0],X[:,1],c=Y)
-axes[1].scatter(X_big[:,0],X_big[:,1],c=Y_big)
+axes[0].scatter(X[:,0],X[:,1],c=Y,s=4)
+axes[1].scatter(X_big[:,0],X_big[:,1],c=Y_big,s=1)
 plt.show()
 
 

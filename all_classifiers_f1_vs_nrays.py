@@ -1,12 +1,10 @@
 import numpy as np
-from sklearn.tree import DecisionTreeClassifier, export_text
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.svm import SVC
 import matplotlib.pyplot as plt
 from scipy.ndimage import gaussian_filter
-from time import time
 from functools import partial
 from sklearn.metrics import jaccard_score
-from tqdm import tqdm
 from functools import partial
 from tqdm.contrib.concurrent import process_map
 
@@ -40,7 +38,12 @@ X = X[cond]
 n_rays = len(X)/decimation_factors
 
 def parallel_func(index_shadow, n_points, classifiers, names, decimation_factors, X):
-    # initialize labels (all to 1=light)
+    """
+    Function to be parallelized.
+    Generates a shadow and tests each classifier with different level of decimation
+    of the training set.
+    """
+    # generate random shadow
     Y = np.random.rand(n_points, n_points)
     Y = gaussian_filter(Y, sigma=n_points/10)
     Y = Y > 0.5
@@ -74,10 +77,12 @@ func =  partial(
     X=X
 )
 
+# Launch parallel processes
 all_scores = process_map(func, range(n_shadows), max_workers=7, chunksize=6)
+# average scores across all shadows
 all_scores = np.mean(all_scores, axis=0)
 
-
+# plot
 fig, axes = plt.subplots(1,len(classifiers), figsize=(9,3))
 for i, name in enumerate(names):
     axes[i].plot(n_rays, all_scores[i], '-o')

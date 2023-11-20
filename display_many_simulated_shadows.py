@@ -1,5 +1,4 @@
 import numpy as np
-from sklearn.tree import DecisionTreeClassifier, export_text
 from sklearn.svm import SVC
 import matplotlib.pyplot as plt
 from scipy.ndimage import gaussian_filter

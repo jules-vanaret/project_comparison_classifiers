@@ -5,10 +5,8 @@ import matplotlib.pyplot as plt
 from scipy.ndimage import gaussian_filter
 from time import time
 from functools import partial
-from sklearn.metrics import jaccard_score
 from tqdm import tqdm
 from functools import partial
-from tqdm.contrib.concurrent import process_map
 from time import time
 
 # np.random.seed(45)

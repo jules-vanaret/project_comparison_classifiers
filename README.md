@@ -14,7 +14,7 @@ To use the scripts, please install the following required Python packages:
 * scipy
 * tqdm
 
-You can install them through [pip](https://pypi.org/project/pip/) with the following command:
+You can install them through [pip](https://pip.pypa.io/en/stable/getting-started/) with the following command:
 ```bash
 pip install numpy matplotlib scikit-learn scipy tqdm
 ```

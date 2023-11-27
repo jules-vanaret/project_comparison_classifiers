@@ -1,5 +1,6 @@
 # Comparison of binary classifiers for the estimation of the boundary of a shadow cast on a triangle
 
+![classifier comparison](imgs/classifier_comparisons.png)
 
 ## Table of contents
 
